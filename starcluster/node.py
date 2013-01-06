@@ -51,10 +51,16 @@ class Node(object):
     hostnames, ips, etc. as well as an ssh object for executing commands,
     creating/modifying files on the node.
 
+    The private key is specified either by location (key_location) or by passing
+    a file like object (key_obj).
+
     'instance' arg must be an instance of boto.ec2.instance.Instance
 
     'key_location' arg is a string that contains the full path to the
     private key corresponding to the keypair used to launch this node
+
+    'key_obj' arg is a file-like object containing the private key
+    used to launch this node. If key_obj is provided then key_location is ignored 
 
     'alias' keyword arg optionally names the node. If no alias is provided,
     the alias is retrieved from the node's user_data based on the node's
@@ -62,11 +68,12 @@ class Node(object):
 
     'user' keyword optionally specifies user to ssh as (defaults to root)
     """
-    def __init__(self, instance, key_location, alias=None, user='root'):
+    def __init__(self, instance, key_location, key_obj=None, alias=None, user='root'):
         self.instance = instance
         self.ec2 = awsutils.EasyEC2(None, None)
         self.ec2._conn = instance.connection
         self.key_location = key_location
+        self.key_obj = key_obj
         self.user = user
         self._alias = alias
         self._groups = None
